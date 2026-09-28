@@ -6,3 +6,11 @@ ruff
 tqdm
 typer
 -e .
+numpy 
+pandas 
+scikit-learn
+mlflow
+dagshub
+dvc
+lightgbm
+joblib
