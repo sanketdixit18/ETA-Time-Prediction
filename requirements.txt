@@ -14,3 +14,6 @@ dagshub
 dvc
 lightgbm
 joblib
+fastapi
+uvicorn
+jinja2

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ETA Predictor</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg>
+      </span>
+      <div>
+        <h1>ETA Predictor</h1>
+        <p>Estimate food delivery time from the order, the rider and the route</p>
+      </div>
+    </div>
+    <span class="model-chip" title="Model served by this API">{{ model_name }} &middot; {{ stage }}</span>
+  </header>
+
+  <main class="layout">
+    <form id="eta-form" class="card" novalidate>
+      <fieldset>
+        <legend>Order</legend>
+        <div class="grid">
+          <label class="field">Order date
+            <input type="date" id="order_date" required>
+            <span class="field-error" data-for="order_date"></span>
+          </label>
+          <label class="field">Order placed at
+            <input type="time" id="order_time" required>
+            <span class="field-error" data-for="order_time"></span>
+          </label>
+          <label class="field">Picked up at
+            <input type="time" id="pickup_time" required>
+            <span class="hint" id="prep-hint"></span>
+            <span class="field-error" data-for="pickup_time"></span>
+          </label>
+          <label class="field">Type of order
+            <select id="type_of_order">
+              <option>Snack</option><option selected>Meal</option><option>Drinks</option><option>Buffet</option>
+            </select>
+          </label>
+          <label class="field">Weather
+            <select id="weather">
+              <option selected>Sunny</option><option>Cloudy</option><option>Fog</option>
+              <option>Windy</option><option>Stormy</option><option>Sandstorms</option>
+            </select>
+          </label>
+          <label class="field">Road traffic
+            <select id="traffic">
+              <option>Low</option><option selected>Medium</option><option>High</option><option>Jam</option>
+            </select>
+          </label>
+          <label class="field">City type
+            <select id="city">
+              <option value="Metropolitian">Metropolitan</option>
+              <option value="Urban" selected>Urban</option>
+              <option value="Semi-Urban">Semi-urban</option>
+            </select>
+          </label>
+          <div class="field">
+            <span class="label-text">Festival day</span>
+            <div class="segmented" role="radiogroup" aria-label="Festival day">
+              <label><input type="radio" name="festival" value="No" checked><span>No</span></label>
+              <label><input type="radio" name="festival" value="Yes"><span>Yes</span></label>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Rider</legend>
+        <div class="grid">
+          <label class="field">Age
+            <input type="number" id="age" min="18" max="70" step="1" value="30" required>
+            <span class="field-error" data-for="age"></span>
+          </label>
+          <label class="field">Rating (1&ndash;5)
+            <input type="number" id="ratings" min="1" max="5" step="0.1" value="4.6" required>
+            <span class="field-error" data-for="ratings"></span>
+          </label>
+          <label class="field">Vehicle
+            <select id="type_of_vehicle">
+              <option value="motorcycle" selected>Motorcycle</option>
+              <option value="scooter">Scooter</option>
+              <option value="electric_scooter">Electric scooter</option>
+              <option value="bicycle">Bicycle</option>
+            </select>
+          </label>
+          <label class="field">Vehicle condition (0&ndash;3)
+            <select id="vehicle_condition">
+              <option>0</option><option>1</option><option selected>2</option><option>3</option>
+            </select>
+          </label>
+          <label class="field">Multiple deliveries (0&ndash;3)
+            <select id="multiple_deliveries">
+              <option>0</option><option selected>1</option><option>2</option><option>3</option>
+            </select>
+            <span class="hint">Orders carried on the same trip</span>
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Route</legend>
+        <div class="presets" role="group" aria-label="Sample routes">
+          <span>Sample route:</span>
+          <button type="button" class="chip" data-sample="mumbai">Mumbai</button>
+          <button type="button" class="chip" data-sample="bengaluru">Bengaluru</button>
+          <button type="button" class="chip" data-sample="pune">Pune</button>
+          <button type="button" class="chip" data-sample="delhi">Delhi</button>
+          <button type="button" class="chip" data-sample="hyderabad">Hyderabad</button>
+        </div>
+        <div class="grid">
+          <label class="field">Restaurant latitude
+            <input type="number" id="restaurant_latitude" step="any" required>
+            <span class="field-error" data-for="restaurant_latitude"></span>
+          </label>
+          <label class="field">Restaurant longitude
+            <input type="number" id="restaurant_longitude" step="any" required>
+            <span class="field-error" data-for="restaurant_longitude"></span>
+          </label>
+          <label class="field">Delivery latitude
+            <input type="number" id="delivery_latitude" step="any" required>
+            <span class="field-error" data-for="delivery_latitude"></span>
+          </label>
+          <label class="field">Delivery longitude
+            <input type="number" id="delivery_longitude" step="any" required>
+            <span class="field-error" data-for="delivery_longitude"></span>
+          </label>
+        </div>
+        <p class="distance" id="distance-readout"></p>
+      </fieldset>
+
+      <div class="actions">
+        <button type="submit" id="submit-btn" class="btn primary">Predict delivery time</button>
+        <button type="reset" id="reset-btn" class="btn">Reset</button>
+      </div>
+    </form>
+
+    <aside class="card result" aria-live="polite" aria-atomic="true">
+      <h2>Estimated delivery time</h2>
+      <div id="result-body" class="result-body state-empty">
+        <p class="placeholder">Fill in the details and press <strong>Predict delivery time</strong>.</p>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="footer">Predictions come from the model registered as <code>{{ model_name }}</code> ({{ stage }}).</footer>
+
+  <script src="{{ url_for('static', path='js/app.js') }}"></script>
+</body>
+</html>
