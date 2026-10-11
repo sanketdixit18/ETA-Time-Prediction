@@ -1,13 +1,19 @@
-
+loguru
+mkdocs
+pip
 python-dotenv
-numpy
-pandas
+ruff
+tqdm
+typer
+-e .
+numpy 
+pandas 
 scikit-learn
 mlflow
 dagshub
+dvc
 lightgbm
 joblib
 fastapi
 uvicorn
 jinja2
-
