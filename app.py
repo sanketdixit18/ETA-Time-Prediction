@@ -230,6 +230,7 @@ import joblib
 import mlflow
 import pandas as pd
 import uvicorn
+import os
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.staticfiles import StaticFiles
