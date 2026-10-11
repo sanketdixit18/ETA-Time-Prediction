@@ -178,7 +178,21 @@ if __name__ == "__main__":
                 shutil.rmtree(model_save_path)
             
             # Save model locally in MLflow format
-            mlflow.sklearn.save_model(sk_model=model, path=model_save_path, signature=model_signature)
+            # mlflow.sklearn.save_model(sk_model=model, path=model_save_path, signature=model_signature)
+            
+            mlflow.sklearn.save_model(
+                sk_model=model,
+                path=model_save_path,
+                signature=model_signature,
+                skops_trusted_types=[
+                    "collections.OrderedDict",
+                    "lightgbm.basic.Booster",
+                    "lightgbm.sklearn.LGBMRegressor",
+                    "sklearn.tree._tree.Tree",
+                    "sklearn.utils._bunch.Bunch"
+                ]
+            )
+
             
             # Log the directory as an artifact
             mlflow.log_artifacts(model_save_path, artifact_path="model")
