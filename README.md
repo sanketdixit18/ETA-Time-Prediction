@@ -197,9 +197,10 @@ Report the results from your actual held-out test set here after running the fin
 
 | Metric | Test result |
 |---|---:|
-| MAE | _Add measured value_ |
-| RMSE | _Add measured value_ |
-| R² | _Add measured value_ |
+| MAE |3.1291 |
+| R² | 0.8278 |
+
+
 
 Use a held-out test set for final reporting and avoid selecting models based on test-set performance. Include the target unit (for example, minutes) and the evaluation split details alongside the numbers.
 
